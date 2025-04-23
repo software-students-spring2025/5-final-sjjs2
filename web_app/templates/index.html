@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JITTER - Test Your Clicking Speed!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <h1 class="app-title">JITTER</h1>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="card">
+        <h2 class="card-title">How fast can you click?</h2>
+        <p style="text-align: center; margin-bottom: 1.5rem;">Test your clicking speed and compete with others!</p>
+        
+        <div class="space-bar" style="margin-bottom: 2rem;">SPACE</div>
+        
+        <a href="{{ url_for('login') }}" class="btn btn-primary" style="margin-bottom: 1rem;">Login</a>
+        <a href="{{ url_for('signup') }}" class="btn btn-secondary">Sign Up</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2025 JITTER Team. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>

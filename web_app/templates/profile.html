@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile - JITTER</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <h1 class="app-title">JITTER</h1>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="card card-wide">
+        <div class="profile">
+          <h2 class="username">{{ username }}</h2>
+          
+          <div class="stats">
+            <h3 class="stat-title">Top Score</h3>
+            <div class="stat-value top-score">{{ top_score }}</div>
+            
+            <div class="stat-row">
+              <div class="stat-col">
+                <h3 class="stat-title">Average Score</h3>
+                <div class="stat-value avg-score">{{ avg_score }}</div>
+              </div>
+              
+              <div class="stat-col">
+                <h3 class="stat-title">Games Played</h3>
+                <div class="stat-value games-played">{{ games_played }}</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="btn-group">
+            <a href="{{ url_for('game') }}" class="btn btn-primary">Back to Game</a>
+            <a href="{{ url_for('logout') }}" class="btn btn-danger">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2025 JITTER Team. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>
