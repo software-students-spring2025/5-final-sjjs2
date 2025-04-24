@@ -82,7 +82,67 @@
   </main>
 
   <!--js script-->
+  <!--js script-->
   <script>
     let timeLeft = 60;
     let score = 0;
     let isGameActive = false;
+    let countdown;
+
+    const timerDisplay = document.querySelector(".timer-value");
+    const scoreDisplay = document.querySelector(".counter-value");
+    const startButton = document.getElementById("start-btn");
+
+    startButton.addEventListener("click", function(event){
+      event.preventDefault();
+      startGame();
+    });
+
+    function startGame(){
+      timeLeft = 60;
+      score = 0;
+      isGameActive = true;
+      scoreDisplay.textContent = score;
+      timerDisplay.textContent = timeLeft;
+
+      clearInterval(countdown);
+
+      countdown = setInterval(() => {
+        timeLeft--;
+        timerDisplay.textContent = timeLeft;
+
+        if (timeLeft <= 0){
+          clearInterval(countdown);
+          isGameActive = false;
+
+          fetch("/update_stats", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({score: score})
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === "success"){
+              window.location.href = data.redirect;
+            }
+          })
+          .catch(error => {
+            console.error("Error sending score:", error);
+            alert("There was an error sending your score.");
+          });
+        }
+      }, 1000);
+    }
+
+    document.addEventListener("keydown", function(event) {
+      if (isGameActive && event.code === "Space") {
+        event.preventDefault();
+        score++;
+        scoreDisplay.textContent = score;
+      }
+    });
+  </script>
+</body>
+</html>
