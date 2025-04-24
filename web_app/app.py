@@ -135,7 +135,8 @@ def create_app():
     def logout():
         logout_user()
         return redirect(url_for("login"))
-
+    
+    @login_required
     @app.route("/view_results" , methods=["POST"])
     def view_results():
         db = app.config["db"]
@@ -148,14 +149,16 @@ def create_app():
             }
             db.statistics.insert_one(add)
 
-            docs = db.stats.find({}, {"_id":0, "numClick": 1, "user": 1}).sort("numClick", 1)
+            docs = db.statistics.find({}, {"_id":0, "numClick": 1, "user": 1}).sort("numClick", 1)
             return render_template("results.html", docs=docs, username=current_user.username)
         return render_template("results.html", docs=[], username=current_user.username)
+    
     
     @app.route("/create_account")
     def create_account():
         return render_template("signup.html")
-
+    
+    @login_required
     @app.route("/play_game")
     def play_game():
         return render_template("game.html")

@@ -16,7 +16,7 @@
             <h1 class="app-title">JITTER</h1>
           </div>
           <nav class="nav-links">
-            <a href="{{ url_for('index') }}" class="nav-link">Home</a>
+            <a href="{{ url_for('home') }}" class="nav-link">Home</a>
         </nav>
         <div>
           <a href="{{ url_for('logout') }}" class="btn-black">Logout</a>
@@ -48,7 +48,7 @@
           <!-- These buttons are initially hidden via CSS and shown when game ends -->
           <div style="display: none; width: 100%;" id="end-controls">
             <a href="#" class="btn btn-primary btn-full" id="restart-btn">Play Again</a>
-            <a href="{{ url_for('results') }}" class="btn btn-accent btn-full" style="margin-top: 1rem;">View Results</a>
+            <a href="{{ url_for('view_results') }}" class="btn btn-accent btn-full" style="margin-top: 1rem;">View Results</a>
           </div>
         </div>
       </div>
