@@ -22,6 +22,7 @@ from pymongo.server_api import ServerApi
 from pymongo.errors import ConnectionFailure, ConfigurationError
 import requests
 from flask import current_app
+import math
 
 
 def connect_mongodb():
@@ -156,10 +157,22 @@ def create_app():
             })
 
     @app.route("/results")
+    @login_required
     def results_page():
         db = app.config["db"]
-        docs = db.statistics.find({}, {"_id":0, "numClick": 1, "user": 1}).sort("numClick", 1)
-        return render_template("results.html", docs=docs, username=current_user.username)
+        user_score = db.statistics.find_one({"user": current_user.username}, sort=[("_id", -1)])["numClick"]
+        docs = db.statistics.find({}, {"_id":0, "numClick": 1}).sort("numClick", 1)
+        all_scores = [d["numClick"] for d in docs if "numClick" in d]
+
+        bin_size = 10
+        max_score = max(all_scores)
+        bin = [0] * (math.ceil(max_score / bin_size) + 1)
+
+        for score in all_scores:
+            i = score // bin_size
+            bin[i] += 1
+
+        return render_template("results.html", bins=bin, username=current_user.username, bin_size=bin_size, user_score=user_score)
 
     @app.route("/create_account")
     def create_account():
