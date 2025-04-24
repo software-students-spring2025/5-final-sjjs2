@@ -33,7 +33,7 @@
       <div class="results">
         <div class="score-container">
             <div class="score">{{ user_score }}</div>
-            <div class="score-label">clicks in 30 seconds</div>
+            <div class="score-label">clicks in 10 seconds</div>
             <div class="percentile">
               You scored better than <strong>{{percentile}}%</strong> of all players!
             </div>
@@ -48,12 +48,17 @@
           <div class="chart-container">
             <canvas id="scoreChart" width="400" height="200" style="height: 300px;"></canvas>
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <!-- Hidden JSON block to feed data to JS -->
+            <script id="jitter-data" type="application/json">
+              {
+                "bins": {{ bins | tojson | safe }},
+                "binSize": {{ bin_size | tojson }},
+                "userScore": {{ user_score | tojson }}
+              }
+            </script>
+
             <script>
-              const jitterData = {
-                bins: {{ bins | tojson | safe }},
-                binSize: {{ bin_size | tojson }},
-                userScore: {{ user_score | tojson }}
-              };
+              const jitterData = JSON.parse(document.getElementById('jitter-data').textContent);
 
               const labels = jitterData.bins.map((_, i) => `${i * jitterData.binSize}-${(i + 1) * jitterData.binSize - 1}`);
               const userIndex = Math.floor(jitterData.userScore / jitterData.binSize);
