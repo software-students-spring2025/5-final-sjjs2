@@ -51,24 +51,8 @@ def connect_mongodb():
         db = None
     return db
 
-# FIX THIS
-def render_home(app):
-    """
-    Render home screen
-    """
-    db = app.config["db"]
-    if db is not None:
-        # Query the speechSummary collection instead of messages
-        query = {"user": current_user.username}
-        # Sort by timestamp in descending order (newest first)
-        docs = list(db.speechSummary.find(query).sort("timestamp", -1))
-
-        # Add this debug print
-        for doc in docs:
-            print(f"Home page document: {doc['_id']}, title: {doc.get('title')}")
-
-        return render_template("home.html", docs=docs, username=current_user.username)
-    return render_template("home.html", docs=[], username=current_user.username)
+def render_home():
+    return render_template("game.html", username=current_user.username)
 
 
 def create_app():
@@ -111,7 +95,7 @@ def create_app():
     @app.route("/")
     @login_required
     def home():
-        return render_home(app)
+        return render_home()
 
     @app.route("/login", methods=["GET", "POST"])
     def login():
