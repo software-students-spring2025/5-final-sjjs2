@@ -127,7 +127,7 @@ def create_app():
                 user_data = db.users.find_one({"username": username})
                 user = User(user_id=str(user_data["_id"]), username=username)
                 login_user(user)
-                return redirect(url_for("onboard"))
+                return redirect(url_for("login"))
         return render_template("signup.html")
 
     @app.route("/logout")
