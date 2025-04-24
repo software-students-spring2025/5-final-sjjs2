@@ -32,6 +32,11 @@
     .btn-black:hover {
       background-color: #333;
     }
+    .stat-section {
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+    
   </style>
 </head>
 <body>
@@ -65,17 +70,15 @@
           <h3 class="stat-title">Top Score</h3>
           <div class="stat-value top-score">{{ top_score }}</div>
           
-          <div class="stat-row">
-            <div class="stat-col">
+            <div class="stat-section">
               <h3 class="stat-title">Average Score</h3>
               <div class="stat-value avg-score">{{ avg_score }}</div>
             </div>
             
-            <div class="stat-col">
+            <div class="stat-section">
               <h3 class="stat-title">Games Played</h3>
               <div class="stat-value games-played">{{ games_played }}</div>
             </div>
-          </div>
         </div>
         
         <div class="game-controls" style="max-width: 300px;">

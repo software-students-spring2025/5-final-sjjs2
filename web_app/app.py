@@ -21,6 +21,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from pymongo.server_api import ServerApi
 from pymongo.errors import ConnectionFailure, ConfigurationError
 import requests
+from flask import current_app
 
 
 def connect_mongodb():
@@ -163,10 +164,34 @@ def create_app():
     def play_game():
         return render_template("game.html")
     
-    @login_required
     @app.route("/profile")
+    @login_required
     def profile():
-        return render_template("profile.html")
+        db = current_app.config["db"]
+        username = current_user.username
+
+        # Pull all scores for this user from the database
+        stats_cursor = db.statistics.find({"user": username})
+        stats = list(stats_cursor)
+
+        # Safely compute profile stats
+        if stats:
+            scores = [s["numClick"] for s in stats if "numClick" in s]
+            top_score = max(scores)
+            avg_score = round(sum(scores) / len(scores), 1)
+            games_played = len(scores)
+        else:
+            top_score = 0
+            avg_score = 0
+            games_played = 0
+
+        return render_template(
+            "profile.html",
+            username=username,
+            top_score=top_score,
+            avg_score=avg_score,
+            games_played=games_played
+        )
 
     return app
 
