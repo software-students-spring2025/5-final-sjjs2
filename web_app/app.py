@@ -137,8 +137,9 @@ def create_app():
         logout_user()
         return redirect(url_for("login"))
     
-    @login_required
+    
     @app.route("/view_results" , methods=["POST"])
+    @login_required
     def view_results():
         db = app.config["db"]
         if db is not None:
@@ -149,12 +150,17 @@ def create_app():
                 "user": current_user.username,
             }
             db.statistics.insert_one(add)
+            return jsonify({
+                "status": "success",
+                "redirect": url_for("results_page")
+            })
 
-            docs = db.statistics.find({}, {"_id":0, "numClick": 1, "user": 1}).sort("numClick", 1)
-            return render_template("results.html", docs=docs, username=current_user.username)
-        return render_template("results.html", docs=[], username=current_user.username)
-    
-    
+    @app.route("/results")
+    def results_page():
+        db = app.config["db"]
+        docs = db.statistics.find({}, {"_id":0, "numClick": 1, "user": 1}).sort("numClick", 1)
+        return render_template("results.html", docs=docs, username=current_user.username)
+
     @app.route("/create_account")
     def create_account():
         return render_template("signup.html")
