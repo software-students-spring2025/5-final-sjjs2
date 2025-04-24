@@ -172,7 +172,17 @@ def create_app():
             i = score // bin_size
             bin[i] += 1
 
-        return render_template("results.html", bins=bin, username=current_user.username, bin_size=bin_size, user_score=user_score)
+        num_less = sum(1 for s in all_scores if s < user_score)
+        percentile = round(100 * num_less / len(all_scores), 1)
+
+        return render_template(
+            "results.html", 
+            bins=bin, 
+            username=current_user.username, 
+            bin_size=bin_size, 
+            user_score=user_score, 
+            percentile=percentile
+        )
 
     @app.route("/create_account")
     def create_account():
