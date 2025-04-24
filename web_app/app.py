@@ -162,6 +162,11 @@ def create_app():
     @app.route("/play_game")
     def play_game():
         return render_template("game.html")
+    
+    @login_required
+    @app.route("/profile")
+    def profile():
+        return render_template("profile.html")
 
     return app
 

@@ -7,20 +7,46 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+  <style>
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .btn-black {
+      background-color: black;
+      color: white;
+      padding: 0.5rem 1.25rem;
+      border-radius: 9999px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    .btn-black:hover {
+      background-color: #333;
+    }
+  </style>
 </head>
 <body>
   <header>
     <div class="container">
       <div class="header-content">
         <div class="logo">
-            <h1 class="app-title">JITTER</h1>
-          </div>
-          <nav class="nav-links">
-            <a href="{{ url_for('index') }}" class="nav-link">Home</a>
-        </nav>
-        <div>
+          <h1 class="app-title">JITTER</h1>
+        </div>
+        <div class="nav-actions">
+          <a href="{{ url_for('profile') }}" class="btn-black">Profile</a>
+          <a href="{{ url_for('home') }}" class="btn-black">Home</a>
           <a href="{{ url_for('logout') }}" class="btn-black">Logout</a>
         </div>
+      </div>
     </div>
   </header>
 
@@ -32,7 +58,7 @@
       
       <div class="profile">
         <div class="profile-header">
-            <h2 class="username">{{ username }}</h2>
+          <h2 class="username">{{ username }}</h2>
         </div>
         
         <div class="stats">
@@ -53,8 +79,8 @@
         </div>
         
         <div class="game-controls" style="max-width: 300px;">
-            <a href="{{ url_for('game') }}" class="btn btn-primary btn-full">Play Game</a>
-          </div>
+          <a href="{{ url_for('play_game') }}" class="btn btn-primary btn-full">Play Game</a>
+        </div>
       </div>
     </div>
   </main>

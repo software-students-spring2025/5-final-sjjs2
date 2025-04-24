@@ -7,20 +7,46 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+  <style>
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .btn-black {
+      background-color: black;
+      color: white;
+      padding: 0.5rem 1.25rem;
+      border-radius: 9999px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    .btn-black:hover {
+      background-color: #333;
+    }
+  </style>
 </head>
 <body>
   <header>
     <div class="container">
       <div class="header-content">
         <div class="logo">
-            <h1 class="app-title">JITTER</h1>
-          </div>
-          <nav class="nav-links">
-            <a href="{{ url_for('home') }}" class="nav-link">Home</a>
-        </nav>
-        <div>
+          <h1 class="app-title">JITTER</h1>
+        </div>
+        <div class="nav-actions">
+          <a href="{{ url_for('profile') }}" class="btn-black">Profile</a>
+          <a href="{{ url_for('home') }}" class="btn-black">Home</a>
           <a href="{{ url_for('logout') }}" class="btn-black">Logout</a>
         </div>
+      </div>
     </div>
   </header>
 
@@ -60,64 +86,3 @@
     let timeLeft = 60;
     let score = 0;
     let isGameActive = false;
-    let countdown;
-
-    const timerDisplay = document.querySelector(".timer-value");
-    const scoreDisplay = document.querySelector(".counter-value");
-    const startButton = document.getElementById("start-btn");
-
-    startButton.addEventListener("click", function(event){
-      event.preventDefault();
-      startGame();
-    });
-
-
-    function startGame(){
-      timeLeft = 60;
-      score = 0;
-      isGameActive = true;
-      scoreDisplay.textContent = score;
-      timerDisplay.textContent = timeLeft;
-
-      clearInterval(countdown);
-
-      countdown = setInterval(() => {
-        timeLeft--;
-        timerDisplay.textContent = timeLeft;
-
-        if (timeLeft <= 0){
-          clearInterval(countdown);
-          isGameActive = false;
-
-          fetch("/update_stats", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({score: score})
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.status === "success"){
-              window.location.href = data.redirect;
-            }
-          })
-          .catch(error => {
-            console.error("Error sending score:", error);
-            alert("There was an error sending your score.");
-          });
-        }
-      }, 1000);
-    }
-
-    document.addEventListener("keydown", function(event) {
-      if (isGameActive && event.code === "Space") {
-        event.preventDefault();
-        score++;
-        scoreDisplay.textContent = score;
-      }
-    });
-  </script>
-
-</body>
-</html>
