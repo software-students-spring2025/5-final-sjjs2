@@ -136,26 +136,29 @@ def create_app():
         logout_user()
         return redirect(url_for("login"))
 
-    @app.route("/view_results")
+    @app.route("/view_results" , methods=["POST"])
     def view_results():
         db = app.config["db"]
         if db is not None:
-            docs = db.stats.find({}, {"_id":1, "numClick": 1, "user": 1}).sort("numClick", 1)
+            data = request.get_json()
+            clicks = data.get("score")
+            add = {
+                "numClick": clicks,
+                "user": current_user.username,
+            }
+            db.statistics.insert_one(add)
+
+            docs = db.stats.find({}, {"_id":0, "numClick": 1, "user": 1}).sort("numClick", 1)
             return render_template("results.html", docs=docs, username=current_user.username)
         return render_template("results.html", docs=[], username=current_user.username)
-
-    @app.route("/update_stats" , methods=["POST"])
-    @login_required
-    def update_stats():
-        pass 
-
+    
     @app.route("/create_account")
     def create_account():
-        pass
+        return render_template("signup.html")
 
     @app.route("/play_game")
     def play_game():
-        pass
+        return render_template("game.html")
 
     return app
 
