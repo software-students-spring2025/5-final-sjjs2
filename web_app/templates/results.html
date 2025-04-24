@@ -32,28 +32,63 @@
       
       <div class="results">
         <div class="score-container">
-            <div class="score">{{ score }}</div>
-            <div class="score-label">clicks in 60 seconds</div>
+            <div class="score">{{ user_score }}</div>
+            <div class="score-label">clicks in 30 seconds</div>
+            <div class="percentile">
+              You scored better than <strong>{{percentile}}%</strong> of all players!
+            </div>
             {% if is_personal_best %}
             <div class="personal-best">New Personal Best!</div>
             {% endif %}
+            
         
         <div class="distribution">
           <h3 class="distribution-title">How You Compare</h3>
           <!-- Static representation of distribution chart -->
           <div class="chart-container">
-            <!-- These bars would be dynamically generated from user data in a real app -->
-            <div class="chart-bar" style="height: 30px;"></div>
-            <div class="chart-bar" style="height: 50px;"></div>
-            <div class="chart-bar" style="height: 70px;"></div>
-            <div class="chart-bar" style="height: 90px;"></div>
-            <div class="chart-bar current" style="height: 100px;">
-              <div class="user-indicator"></div>
-            </div>
-            <div class="chart-bar" style="height: 70px;"></div>
-            <div class="chart-bar" style="height: 50px;"></div>
-            <div class="chart-bar" style="height: 20px;"></div>
-            <div class="chart-bar" style="height: 10px;"></div>
+            <canvas id="scoreChart" width="400" height="200" style="height: 300px;"></canvas>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+              const jitterData = {
+                bins: {{ bins | tojson | safe }},
+                binSize: {{ bin_size | tojson }},
+                userScore: {{ user_score | tojson }}
+              };
+
+              const labels = jitterData.bins.map((_, i) => `${i * jitterData.binSize}-${(i + 1) * jitterData.binSize - 1}`);
+              const userIndex = Math.floor(jitterData.userScore / jitterData.binSize);
+              const backgroundColors = jitterData.bins.map((_, i) =>
+                i === userIndex ? 'rgba(255, 99, 132, 0.8)' : 'rgba(54, 162, 235, 0.6)'
+              );
+
+              const ctx = document.getElementById('scoreChart').getContext('2d');
+              new Chart(ctx, {
+                type: 'bar',
+                data: {
+                  labels: labels,
+                  datasets: [{
+                    label: 'Score Distribution',
+                    data: jitterData.bins,
+                    backgroundColor: backgroundColors,
+                    borderColor: 'rgba(0,0,0,0.1)',
+                    borderWidth: 1
+                  }]
+                },
+                options: {
+                  scales: {
+                    y: { beginAtZero: true }
+                  },
+                  plugins: {
+                    tooltip: {
+                      callbacks: {
+                        afterLabel: ctx => ctx.dataIndex === userIndex ? '← Your Score' : ''
+                      }
+                    }
+                  }
+                }
+              });
+            </script>
+
           </div>
           
           <div class="chart-label">Clicks per minute</div>
