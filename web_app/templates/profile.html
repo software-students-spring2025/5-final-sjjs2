@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Profile - JITTER</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 </head>
@@ -12,47 +12,52 @@
   <header>
     <div class="container">
       <div class="header-content">
-        <h1 class="app-title">JITTER</h1>
-      </div>
+        <div class="logo">
+            <h1 class="app-title">JITTER</h1>
+          </div>
+          <nav class="nav-links">
+            <a href="{{ url_for('index') }}" class="nav-link">Home</a>
+        </nav>
+        <div>
+          <a href="{{ url_for('logout') }}" class="btn-black">Logout</a>
+        </div>
     </div>
   </header>
 
   <main>
     <div class="container">
-      <div class="card card-wide">
-        <div class="profile">
-          <h2 class="username">{{ username }}</h2>
+      <div class="hero" style="text-align: center; margin-bottom: 2rem;">
+        <h2 class="hero-title" style="font-size: 2.5rem;">Your Profile</h2>
+      </div>
+      
+      <div class="profile">
+        <div class="profile-header">
+            <h2 class="username">{{ username }}</h2>
+        </div>
+        
+        <div class="stats">
+          <h3 class="stat-title">Top Score</h3>
+          <div class="stat-value top-score">{{ top_score }}</div>
           
-          <div class="stats">
-            <h3 class="stat-title">Top Score</h3>
-            <div class="stat-value top-score">{{ top_score }}</div>
+          <div class="stat-row">
+            <div class="stat-col">
+              <h3 class="stat-title">Average Score</h3>
+              <div class="stat-value avg-score">{{ avg_score }}</div>
+            </div>
             
-            <div class="stat-row">
-              <div class="stat-col">
-                <h3 class="stat-title">Average Score</h3>
-                <div class="stat-value avg-score">{{ avg_score }}</div>
-              </div>
-              
-              <div class="stat-col">
-                <h3 class="stat-title">Games Played</h3>
-                <div class="stat-value games-played">{{ games_played }}</div>
-              </div>
+            <div class="stat-col">
+              <h3 class="stat-title">Games Played</h3>
+              <div class="stat-value games-played">{{ games_played }}</div>
             </div>
           </div>
-          
-          <div class="btn-group">
-            <a href="{{ url_for('game') }}" class="btn btn-primary">Back to Game</a>
-            <a href="{{ url_for('logout') }}" class="btn btn-danger">Logout</a>
-          </div>
         </div>
+        
+        <div class="game-controls" style="max-width: 300px;">
+            <a href="{{ url_for('game') }}" class="btn btn-primary btn-full">Play Game</a>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline btn-full" style="margin-top: 1rem;">Log Out</a>
+          </div>
       </div>
     </div>
   </main>
-
-  <footer>
-    <div class="container">
-      <p>&copy; 2025 JITTER Team. All rights reserved.</p>
-    </div>
-  </footer>
 </body>
 </html>

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>JITTER - Test Your Clicking Speed!</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 </head>
@@ -12,29 +12,42 @@
   <header>
     <div class="container">
       <div class="header-content">
-        <h1 class="app-title">JITTER</h1>
-      </div>
+        <div class="logo">
+            <h1 class="app-title">JITTER</h1>
+          </div>
+          <nav class="nav-links">
+            <a href="{{ url_for('index') }}" class="nav-link">Home</a>
+        </nav>
+        <div>
+          <a href="{{ url_for('login') }}" class="nav-link" style="margin-right: 1rem;">Login</a>
+          <a href="{{ url_for('signup') }}" class="btn-black">Sign Up</a>
+          </div>
     </div>
   </header>
 
   <main>
     <div class="container">
-      <div class="card">
-        <h2 class="card-title">How fast can you click?</h2>
-        <p style="text-align: center; margin-bottom: 1.5rem;">Test your clicking speed and compete with others!</p>
+      <div class="hero">
+        <h2 class="hero-title">How fast can you <span class="title-underline">click</span>?</h2>
+        <p class="hero-subtitle">Challenge yourself and compete with others in this addictive space bar clicking game. Create an account to track your progress and climb the global leaderboard.</p>
+      </div>
+      
+      <div class="card-grid">
+        <div class="card">
+          <span class="card-label">PLAY</span>
+          <h3 class="card-title">Test Your Speed</h3>
+          <p class="card-text">Press the space bar as many times as possible in 60 seconds. Simple, yet surprisingly addictive!</p>
+          <a href="{{ url_for('login') }}" class="btn-outline">Log In to Play</a>
+        </div>
         
-        <div class="space-bar" style="margin-bottom: 2rem;">SPACE</div>
-        
-        <a href="{{ url_for('login') }}" class="btn btn-primary" style="margin-bottom: 1rem;">Login</a>
-        <a href="{{ url_for('signup') }}" class="btn btn-secondary">Sign Up</a>
+        <div class="card">
+          <span class="card-label">TRACK</span>
+          <h3 class="card-title">Monitor Your Progress</h3>
+          <p class="card-text">See your average score, personal best, and compare your results with players from around the world.</p>
+          <a href="{{ url_for('signup') }}" class="btn-outline">Create Account</a>
+        </div>
       </div>
     </div>
   </main>
-
-  <footer>
-    <div class="container">
-      <p>&copy; 2025 JITTER Team. All rights reserved.</p>
-    </div>
-  </footer>
 </body>
 </html>

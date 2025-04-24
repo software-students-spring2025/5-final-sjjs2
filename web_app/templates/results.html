@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Results - JITTER</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 </head>
@@ -12,58 +12,59 @@
   <header>
     <div class="container">
       <div class="header-content">
-        <h1 class="app-title">JITTER</h1>
-      </div>
+        <div class="logo">
+            <h1 class="app-title">JITTER</h1>
+          </div>
+          <nav class="nav-links">
+            <a href="{{ url_for('index') }}" class="nav-link">Home</a>
+        </nav>
+        <div>
+          <a href="{{ url_for('logout') }}" class="btn-black">Logout</a>
+        </div>
     </div>
   </header>
 
   <main>
     <div class="container">
-      <div class="card card-wide">
-        <h2 class="card-title">Your Results</h2>
+      <div class="hero" style="text-align: center; margin-bottom: 2rem;">
+        <h2 class="hero-title" style="font-size: 2.5rem;">Your Results</h2>
+      </div>
+      
+      <div class="results">
+        <div class="score-container">
+            <div class="score">{{ score }}</div>
+            <div class="score-label">clicks in 60 seconds</div>
+            {% if is_personal_best %}
+            <div class="personal-best">New Personal Best!</div>
+            {% endif %}
         
-        <div class="results">
-          <div class="score">{{ score }}</div>
-          <div class="score-label">clicks in 60 seconds</div>
-          
-          {% if is_personal_best %}
-            <div class="personal-best">New Personal Best! (Previous: {{ previous_best }})</div>
-          {% endif %}
-          
-          <div class="distribution">
-            <!-- Static representation of distribution chart -->
-            <div class="chart-container">
-              <!-- These bars would be dynamically generated from user data in a real app -->
-              <div class="chart-bar" style="height: 30px;"></div>
-              <div class="chart-bar" style="height: 50px;"></div>
-              <div class="chart-bar" style="height: 70px;"></div>
-              <div class="chart-bar" style="height: 90px;"></div>
-              <div class="chart-bar current" style="height: 100px;">
-                <div class="user-indicator"></div>
-              </div>
-              <div class="chart-bar" style="height: 70px;"></div>
-              <div class="chart-bar" style="height: 50px;"></div>
-              <div class="chart-bar" style="height: 20px;"></div>
-              <div class="chart-bar" style="height: 10px;"></div>
+        <div class="distribution">
+          <h3 class="distribution-title">How You Compare</h3>
+          <!-- Static representation of distribution chart -->
+          <div class="chart-container">
+            <!-- These bars would be dynamically generated from user data in a real app -->
+            <div class="chart-bar" style="height: 30px;"></div>
+            <div class="chart-bar" style="height: 50px;"></div>
+            <div class="chart-bar" style="height: 70px;"></div>
+            <div class="chart-bar" style="height: 90px;"></div>
+            <div class="chart-bar current" style="height: 100px;">
+              <div class="user-indicator"></div>
             </div>
-            
-            <div class="chart-label">Clicks per minute</div>
+            <div class="chart-bar" style="height: 70px;"></div>
+            <div class="chart-bar" style="height: 50px;"></div>
+            <div class="chart-bar" style="height: 20px;"></div>
+            <div class="chart-bar" style="height: 10px;"></div>
           </div>
           
-          <div class="btn-group">
-            <a href="{{ url_for('game') }}" class="btn btn-primary">Play Again</a>
-            <a href="{{ url_for('profile') }}" class="btn btn-secondary">View Profile</a>
-            <a href="{{ url_for('profile') }}" class="btn btn-accent">View All Games</a>
-          </div>
+          <div class="chart-label">Clicks per minute</div>
         </div>
+        
+        <div class="game-controls" style="max-width: 300px;">
+            <a href="{{ url_for('game') }}" class="btn btn-primary btn-full">Play Again</a>
+            <a href="{{ url_for('profile') }}" class="btn btn-outline btn-full" style="margin-top: 1rem;">View Profile</a>
+          </div>
       </div>
     </div>
   </main>
-
-  <footer>
-    <div class="container">
-      <p>&copy; 2025 JITTER Team. All rights reserved.</p>
-    </div>
-  </footer>
 </body>
 </html>
