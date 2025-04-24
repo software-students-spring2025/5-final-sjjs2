@@ -160,12 +160,24 @@ def create_app():
     def view_results():
         db = app.config["db"]
         if db is not None:
-            docs = db.stats.find({}, {"_id":1, "numClick": 1}).sort("numClick", 1)
+            docs = db.stats.find({}, {"_id":1, "numClick": 1, "user": 1}).sort("numClick", 1)
             return render_template("results.html", docs=docs, username=current_user.username)
         return render_template("results.html", docs=[], username=current_user.username)
 
-    return app
+    @app.route("/update_stats" , methods=["POST"])
+    @login_required
+    def update_stats():
+        pass 
 
+    @app.route("/create_account")
+    def create_account():
+        pass
+
+    @app.route("/play_game")
+    def play_game():
+        pass
+
+    return app
 
 if __name__ == "__main__":
     flaskapp = create_app()
