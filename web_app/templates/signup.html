@@ -7,17 +7,45 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+  <style>
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .btn-black {
+      background-color: black;
+      color: white;
+      padding: 0.5rem 1.25rem;
+      border-radius: 9999px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    .btn-black:hover {
+      background-color: #333;
+    }
+  </style>
 </head>
 <body>
   <header>
     <div class="container">
       <div class="header-content">
         <div class="logo">
-            <h1 class="app-title">JITTER</h1>
-          </div>
-          <nav class="nav-links">
-            <a href="{{ url_for('index') }}" class="nav-link">Home</a>
-        </nav>
+          <h1 class="app-title">JITTER</h1>
+        </div>
+        <div class="nav-actions">
+          <a href="{{ url_for('home') }}" class="btn-black">Home</a>
+          <a href="{{ url_for('login') }}" class="btn-black">Log In</a>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -30,32 +58,32 @@
         </div>
         
         <form action="{{ url_for('signup') }}" method="POST">
-            <div class="form-group">
-              <label for="username" class="form-label">Username</label>
-              <input type="text" class="form-control" id="username" name="username" placeholder="Choose a username" required>
-            </div>
-            
-            <div class="form-group">
-              <label for="email" class="form-label">Email</label>
-              <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
-            </div>
-            
-            <div class="form-group">
-              <label for="password" class="form-label">Password</label>
-              <input type="password" class="form-control" id="password" name="password" placeholder="Create a password" required>
-            </div>
-            
-            <div class="form-group">
-              <label for="confirm_password" class="form-label">Confirm Password</label>
-              <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm your password" required>
-            </div>
-            
-            <button type="submit" class="btn btn-primary btn-full">Create Account</button>
-          </form>
+          <div class="form-group">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" class="form-control" id="username" name="username" placeholder="Choose a username" required>
+          </div>
           
-          <p style="text-align: center; margin-top: 1.5rem; color: var(--neutral-600);">
-            Already have an account? <a href="{{ url_for('login') }}" style="color: var(--accent-color); text-decoration: none; font-weight: 500;">Log in</a>
-          </p>
+          <div class="form-group">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password" placeholder="Create a password" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="confirm_password" class="form-label">Confirm Password</label>
+            <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm your password" required>
+          </div>
+          
+          <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+        </form>
+        
+        <p style="text-align: center; margin-top: 1.5rem; color: var(--neutral-600);">
+          Already have an account? <a href="{{ url_for('login') }}" style="color: var(--accent-color); text-decoration: none; font-weight: 500;">Log in</a>
+        </p>
       </div>
     </div>
   </main>
