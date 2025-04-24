@@ -115,7 +115,7 @@
           clearInterval(countdown);
           isGameActive = false;
 
-          fetch("/update_stats", {
+          fetch("/view_results", {
             method: "POST",
             headers: {
               "Content-Type": "application/json"
@@ -136,11 +136,20 @@
       }, 1000);
     }
 
+    let spacePressed = false;
+
     document.addEventListener("keydown", function(event) {
-      if (isGameActive && event.code === "Space") {
+      if (isGameActive && event.code === "Space" && !spacePressed) {
         event.preventDefault();
+        spacePressed = true;
         score++;
         scoreDisplay.textContent = score;
+      }
+    });
+
+    document.addEventListener("keyup", function(event) {
+      if (event.code === "Space"){
+        spacePressed = false;
       }
     });
   </script>
