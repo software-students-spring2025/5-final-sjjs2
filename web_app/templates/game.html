@@ -99,7 +99,7 @@
     });
 
     function startGame(){
-      timeLeft = 60;
+      timeLeft = 10;
       score = 0;
       isGameActive = true;
       scoreDisplay.textContent = score;
@@ -131,6 +131,7 @@
           .catch(error => {
             console.error("Error sending score:", error);
             alert("There was an error sending your score.");
+            alert(error);
           });
         }
       }, 1000);
