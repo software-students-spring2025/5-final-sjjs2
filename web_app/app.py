@@ -100,6 +100,21 @@ def create_app():
     def home():
         return render_home()
 
+    # Add this new route to check username availability
+    @app.route("/check_username", methods=["POST"])
+    def check_username():
+        data = request.get_json()
+        username = data.get("username", "")
+        
+        db = current_app.config["db"]
+        if db is not None:
+            # Case insensitive search using a regular expression
+            existing_user = db.users.find_one({"username": {"$regex": f"^{username}$", "$options": "i"}})
+            return jsonify({"available": existing_user is None})
+        
+        # Default to unavailable if DB connection issues
+        return jsonify({"available": False})
+
     @app.route("/login", methods=["GET", "POST"])
     def login():
         if request.method == "POST":
@@ -107,12 +122,14 @@ def create_app():
             password = request.form["password"]
             db = app.config["db"]
             if db is not None:
-                user_data = db.users.find_one({"username": username})
+                # Case insensitive search using a regular expression
+                user_data = db.users.find_one({"username": {"$regex": f"^{username}$", "$options": "i"}})
                 if user_data and check_password_hash(user_data["password"], password):
-                    user = User(user_id=str(user_data["_id"]), username=username)
+                    # Use the exact username case from the database
+                    user = User(user_id=str(user_data["_id"]), username=user_data["username"])
                     login_user(user)
                     return redirect(url_for("home"))
-                return render_template("login.html", error="Invalid credentials")
+                return render_template("login.html", error="Invalid username or password. Please try again.")
         return render_template("login.html")
 
     @app.route("/signup", methods=["GET", "POST"])
@@ -120,17 +137,36 @@ def create_app():
         if request.method == "POST":
             username = request.form["username"]
             password = request.form["password"]
+            confirm_password = request.form.get("confirm_password")
+            
+            # Check if passwords match
+            if password != confirm_password:
+                # Redirect to login with a flash message instead of showing an error
+                flash("Passwords did not match. Please try again.")
+                return redirect(url_for("login"))
+                
             db = app.config["db"]
             if db is not None:
-                existing_user = db.users.find_one({"username": username})
+                # Case insensitive check for existing username
+                existing_user = db.users.find_one({"username": {"$regex": f"^{username}$", "$options": "i"}})
                 if existing_user:
-                    return render_template("signup.html", error="User already exists")
+                    # Redirect to login with a flash message instead of showing an error
+                    flash("Username already exists. Please log in or choose a different username.")
+                    return redirect(url_for("login"))
+                    
                 hashed_password = generate_password_hash(password)
-                db.users.insert_one({"username": username, "password": hashed_password})
-                user_data = db.users.find_one({"username": username})
-                user = User(user_id=str(user_data["_id"]), username=username)
+                # Store the username as provided by the user (preserving case)
+                db.users.insert_one({
+                    "username": username,
+                    "password": hashed_password
+                })
+                
+                # Get the user data for login
+                user_data = db.users.find_one({"username": {"$regex": f"^{username}$", "$options": "i"}})
+                user = User(user_id=str(user_data["_id"]), username=user_data["username"])
                 login_user(user)
                 return redirect(url_for("home"))
+        
         return render_template("signup.html")
 
     @app.route("/logout")
