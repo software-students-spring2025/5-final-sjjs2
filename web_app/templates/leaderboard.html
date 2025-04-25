@@ -35,8 +35,8 @@
     
     .leaderboard-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 2.5rem;
       margin-top: 3rem;
     }
     
@@ -103,9 +103,17 @@
       background-color: rgba(207, 128, 101, 0.1) !important;
     }
     
+    @media (max-width: 1200px) {
+      .leaderboard-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+      }
+    }
+    
     @media (max-width: 768px) {
       .leaderboard-grid {
         grid-template-columns: 1fr;
+        gap: 1.5rem;
       }
     }
   </style>
@@ -171,6 +179,29 @@
             </thead>
             <tbody>
               {% for entry in daily_leaderboard %}
+                <tr {% if entry.username == current_user.username %}class="user-highlight"{% endif %}>
+                  <td class="rank">{{ entry.rank }}</td>
+                  <td>{{ entry.username }}</td>
+                  <td class="score">{{ entry.score }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="leaderboard-card">
+          <h3 class="leaderboard-title">Top 10 Average</h3>
+          <div class="leaderboard-subtitle">Players with 3+ games required</div>
+          <table class="leaderboard-table">
+            <thead>
+              <tr>
+                <th width="15%">Rank</th>
+                <th>Player</th>
+                <th width="25%">Average</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for entry in average_leaderboard %}
                 <tr {% if entry.username == current_user.username %}class="user-highlight"{% endif %}>
                   <td class="rank">{{ entry.rank }}</td>
                   <td>{{ entry.username }}</td>

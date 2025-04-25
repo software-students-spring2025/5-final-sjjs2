@@ -289,7 +289,40 @@ def create_app():
             
             previous_score = result["numClick"]
         
-        # Ensure both leaderboards have at least 10 entries for consistent height
+        # Get top players by average score
+        # First group by user and calculate average scores
+        average_pipeline = [
+            {"$group": {
+                "_id": "$user",
+                "averageScore": {"$avg": "$numClick"},
+                "gamesPlayed": {"$sum": 1}
+            }},
+            # Only include users with at least 3 games played to avoid outliers
+            {"$match": {"gamesPlayed": {"$gte": 3}}},
+            {"$sort": {"averageScore": -1}},
+            {"$limit": 10}
+        ]
+        
+        average_results = list(db.statistics.aggregate(average_pipeline))
+        
+        # Format average leaderboard with proper ranking (handling ties)
+        average_leaderboard = []
+        current_rank = 1
+        previous_score = None
+        
+        for result in average_results:
+            if previous_score is not None and round(result["averageScore"], 1) < previous_score:
+                current_rank += 1
+            
+            average_leaderboard.append({
+                "rank": current_rank,
+                "username": result.get("_id", "Unknown"),
+                "score": round(result["averageScore"], 1)  # Round to 1 decimal place
+            })
+            
+            previous_score = round(result["averageScore"], 1)
+        
+        # Ensure all leaderboards have at least 10 entries for consistent height
         # Fill with empty entries if needed
         while len(all_time_leaderboard) < 10:
             all_time_leaderboard.append({
@@ -304,11 +337,19 @@ def create_app():
                 "username": "-",
                 "score": "-"
             })
+            
+        while len(average_leaderboard) < 10:
+            average_leaderboard.append({
+                "rank": "-",
+                "username": "-",
+                "score": "-"
+            })
         
         return render_template(
             "leaderboard.html",
             all_time_leaderboard=all_time_leaderboard,
             daily_leaderboard=daily_leaderboard,
+            average_leaderboard=average_leaderboard,
             daily_date=daily_date
         )
     
