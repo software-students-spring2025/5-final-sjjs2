@@ -418,6 +418,21 @@ def create_app():
             average_leaderboard=average_leaderboard,
             daily_date=daily_date
         )
+
+    @app.route("/one_v_one_setup")
+    @login_required
+    def one_v_one_setup():
+        return render_template("one_v_one_setup.html")
+
+    @app.route("/one_v_one_game")
+    @login_required
+    def one_v_one_game():
+        return render_template("one_v_one_game.html")
+
+    @app.route("/one_v_one_results")
+    @login_required
+    def one_v_one_results():
+        return render_template("one_v_one_results.html")
     
     return app
 

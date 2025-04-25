@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1v1 Results - JITTER</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+  <style>
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .btn-black {
+      background-color: black;
+      color: white;
+      padding: 0.5rem 1.25rem;
+      border-radius: 9999px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    .btn-black:hover {
+      background-color: #333;
+    }
+
+    .results-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+      background-color: white;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+    }
+
+    .winner-panel {
+      background-color: rgba(207, 128, 101, 0.1);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      text-align: center;
+      box-shadow: var(--shadow);
+      border: 2px solid var(--accent-color);
+      animation: glow 2s infinite alternate;
+    }
+
+    .winner-label {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent-color);
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .winner-score {
+      font-size: 5rem;
+      font-weight: 800;
+      color: var(--accent-color);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+
+    .scores-container {
+      display: flex;
+      justify-content: space-between;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .player-score {
+      flex: 1;
+      text-align: center;
+      padding: 1.5rem;
+      background-color: var(--neutral-100);
+      border-radius: var(--radius);
+    }
+
+    .player-name {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .score {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--neutral-900);
+    }
+
+    @keyframes glow {
+      from {
+        box-shadow: 0 0 10px rgba(207, 128, 101, 0.2);
+      }
+      to {
+        box-shadow: 0 0 20px rgba(207, 128, 101, 0.5);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <h1 class="app-title">JITTER</h1>
+        </div>
+        <div class="nav-actions">
+          <a href="{{ url_for('home') }}" class="btn-black">Play</a>
+          <a href="{{ url_for('leaderboard') }}" class="btn-black">Leaderboard</a>
+          <a href="{{ url_for('profile') }}" class="btn-black">Profile</a>
+          <a href="{{ url_for('logout') }}" class="btn-black">Logout</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="results-container">
+        <h2 class="hero-title" style="text-align: center; margin-bottom: 2rem;">1v1 Results</h2>
+        
+        <div id="winner-panel" class="winner-panel">
+          <div class="winner-label">Winner</div>
+          <div id="winner-name" class="winner-name"></div>
+          <div id="winner-score" class="winner-score"></div>
+          <div class="winner-detail">clicks in 10 seconds</div>
+        </div>
+        
+        <div class="scores-container">
+          <div class="player-score">
+            <div id="player1-name" class="player-name"></div>
+            <div id="player1-score" class="score"></div>
+          </div>
+          <div class="player-score">
+            <div id="player2-name" class="player-name"></div>
+            <div id="player2-score" class="score"></div>
+          </div>
+        </div>
+        
+        <div class="game-controls" style="max-width: 300px; margin: 0 auto;">
+          <a href="{{ url_for('one_v_one_setup') }}" class="btn btn-primary btn-full">Play Again</a>
+          <a href="{{ url_for('home') }}" class="btn btn-outline btn-full" style="margin-top: 1rem;">Back to Home</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Get player names and scores from sessionStorage
+    const player1Name = sessionStorage.getItem('player1');
+    const player2Name = sessionStorage.getItem('player2');
+    const player1Score = parseInt(sessionStorage.getItem('player1Score'));
+    const player2Score = parseInt(sessionStorage.getItem('player2Score'));
+    
+    // Display player names and scores
+    document.getElementById('player1-name').textContent = player1Name;
+    document.getElementById('player2-name').textContent = player2Name;
+    document.getElementById('player1-score').textContent = player1Score;
+    document.getElementById('player2-score').textContent = player2Score;
+    
+    // Determine and display winner
+    let winnerName, winnerScore;
+    if (player1Score > player2Score) {
+      winnerName = player1Name;
+      winnerScore = player1Score;
+    } else if (player2Score > player1Score) {
+      winnerName = player2Name;
+      winnerScore = player2Score;
+    } else {
+      winnerName = "It's a tie!";
+      winnerScore = player1Score;
+    }
+    
+    document.getElementById('winner-name').textContent = winnerName;
+    document.getElementById('winner-score').textContent = winnerScore;
+  </script>
+</body>
+</html> 

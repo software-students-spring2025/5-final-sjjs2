@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1v1 Game - JITTER</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+  <style>
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .btn-black {
+      background-color: black;
+      color: white;
+      padding: 0.5rem 1.25rem;
+      border-radius: 9999px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    .btn-black:hover {
+      background-color: #333;
+    }
+
+    .game-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .players-container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 800px;
+      gap: 2rem;
+    }
+
+    .player {
+      flex: 1;
+      text-align: center;
+      padding: 2rem;
+      background-color: white;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+    }
+
+    .player-name {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .player-score {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--accent-color);
+    }
+
+    .timer-container {
+      text-align: center;
+    }
+
+    .timer {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--accent-color);
+    }
+
+    .instruction {
+      text-align: center;
+      font-size: 1.25rem;
+      color: var(--neutral-700);
+    }
+
+    .accent-text {
+      color: var(--accent-color);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <h1 class="app-title">JITTER</h1>
+        </div>
+        <div class="nav-actions">
+          <a href="{{ url_for('home') }}" class="btn-black">Play</a>
+          <a href="{{ url_for('leaderboard') }}" class="btn-black">Leaderboard</a>
+          <a href="{{ url_for('profile') }}" class="btn-black">Profile</a>
+          <a href="{{ url_for('logout') }}" class="btn-black">Logout</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="game-container">
+        <div class="timer-container">
+          <div class="timer">10</div>
+          <span class="timer-label">seconds remaining</span>
+        </div>
+        
+        <div class="players-container">
+          <div class="player">
+            <div class="player-name" id="player1-name"></div>
+            <div class="player-score" id="player1-score">0</div>
+          </div>
+          <div class="player">
+            <div class="player-name" id="player2-name"></div>
+            <div class="player-score" id="player2-score">0</div>
+          </div>
+        </div>
+        
+        <p class="instruction">
+          Player 1: Press <span class="accent-text">Left Shift</span> to click<br>
+          Player 2: Press <span class="accent-text">Right Shift</span> to click
+        </p>
+        
+        <div class="game-controls">
+          <a href="#" class="btn btn-primary btn-full" id="start-btn">Start Game</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Get player names from sessionStorage
+    const player1Name = sessionStorage.getItem('player1');
+    const player2Name = sessionStorage.getItem('player2');
+    
+    // Display player names
+    document.getElementById('player1-name').textContent = player1Name;
+    document.getElementById('player2-name').textContent = player2Name;
+
+    let timeLeft = 10;
+    let player1Score = 0;
+    let player2Score = 0;
+    let isGameActive = false;
+    let countdown;
+
+    const timerDisplay = document.querySelector(".timer");
+    const player1ScoreDisplay = document.getElementById("player1-score");
+    const player2ScoreDisplay = document.getElementById("player2-score");
+    const startButton = document.getElementById("start-btn");
+
+    startButton.addEventListener("click", function(event){
+      event.preventDefault();
+      startGame();
+    });
+
+    function startGame(){
+      timeLeft = 10;
+      player1Score = 0;
+      player2Score = 0;
+      isGameActive = true;
+      player1ScoreDisplay.textContent = player1Score;
+      player2ScoreDisplay.textContent = player2Score;
+      timerDisplay.textContent = timeLeft;
+
+      clearInterval(countdown);
+
+      countdown = setInterval(() => {
+        timeLeft--;
+        timerDisplay.textContent = timeLeft;
+
+        if (timeLeft <= 0){
+          clearInterval(countdown);
+          isGameActive = false;
+
+          // Store scores in sessionStorage
+          sessionStorage.setItem('player1Score', player1Score);
+          sessionStorage.setItem('player2Score', player2Score);
+          
+          // Redirect to results page
+          window.location.href = "{{ url_for('one_v_one_results') }}";
+        }
+      }, 1000);
+    }
+
+    document.addEventListener("keydown", function(event) {
+      if (!isGameActive) return;
+      
+      if (event.code === "ShiftLeft") {
+        event.preventDefault();
+        player1Score++;
+        player1ScoreDisplay.textContent = player1Score;
+      } else if (event.code === "ShiftRight") {
+        event.preventDefault();
+        player2Score++;
+        player2ScoreDisplay.textContent = player2Score;
+      }
+    });
+  </script>
+</body>
+</html> 
