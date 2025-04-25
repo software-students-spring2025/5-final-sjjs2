@@ -11,14 +11,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Copy project files to DigitalOcean
+      - name: Copy project to Droplet
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.DO_HOST }}
           username: ${{ secrets.DO_USER }}
           key: ${{ secrets.DO_SSH_KEY }}
-          source: "."
+          source: "./* .env"
           target: "/opt/myapp"
+          strip_components: 0
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v0.1.10
