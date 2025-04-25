@@ -7,6 +7,75 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+  <style>
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .btn-black {
+      background-color: black;
+      color: white;
+      padding: 0.5rem 1.25rem;
+      border-radius: 9999px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    .btn-black:hover {
+      background-color: #333;
+    }
+    
+    .personal-best-panel {
+      background-color: rgba(207, 128, 101, 0.1);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      text-align: center;
+      box-shadow: var(--shadow);
+      border: 2px solid var(--accent-color);
+      animation: glow 2s infinite alternate;
+    }
+    
+    .personal-best-label {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent-color);
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .personal-best-score {
+      font-size: 5rem;
+      font-weight: 800;
+      color: var(--accent-color);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+    
+    .personal-best-detail {
+      font-size: 1.125rem;
+      color: var(--neutral-700);
+      margin-top: 0.5rem;
+    }
+    
+    @keyframes glow {
+      from {
+        box-shadow: 0 0 10px rgba(207, 128, 101, 0.2);
+      }
+      to {
+        box-shadow: 0 0 20px rgba(207, 128, 101, 0.5);
+      }
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -17,11 +86,12 @@
           </div>
           <nav class="nav-links">
             <a href="{{ url_for('home') }}" class="nav-link">Home</a>
-        </nav>
-        <div>
+          </nav>
+          <div>
+            <a href="{{ url_for('profile') }}" class="btn-black">Profile</a>
             <a href="{{ url_for('leaderboard') }}" class="btn-black">Leaderboard</a>
-          <a href="{{ url_for('logout') }}" class="btn-black">Logout</a>
-        </div>
+            <a href="{{ url_for('logout') }}" class="btn-black">Logout</a>
+          </div>
     </div>
   </header>
 
@@ -32,16 +102,22 @@
       </div>
       
       <div class="results">
+        {% if is_personal_best %}
+        <div class="personal-best-panel">
+          <div class="personal-best-label">New Personal Best!</div>
+          <div class="personal-best-score">{{ user_score }}</div>
+          <div class="personal-best-detail">clicks in 10 seconds</div>
+        </div>
+        {% else %}
         <div class="score-container">
-            <div class="score">{{ user_score }}</div>
-            <div class="score-label">clicks in 10 seconds</div>
-            <div class="percentile">
-              You scored better than <strong>{{percentile}}%</strong> of all players!
-            </div>
-            {% if is_personal_best %}
-            <div class="personal-best">New Personal Best!</div>
-            {% endif %}
-            
+          <div class="score">{{ user_score }}</div>
+          <div class="score-label">clicks in 10 seconds</div>
+        </div>
+        {% endif %}
+        
+        <div class="percentile">
+          You scored better than <strong>{{percentile}}%</strong> of all players!
+        </div>
         
         <div class="distribution">
           <h3 class="distribution-title">How You Compare</h3>

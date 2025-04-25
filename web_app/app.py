@@ -197,7 +197,11 @@ def create_app():
     @login_required
     def results_page():
         db = app.config["db"]
-        user_score = db.statistics.find_one({"user": current_user.username}, sort=[("_id", -1)])["numClick"]
+        # Get the most recent score for this user
+        latest_score = db.statistics.find_one({"user": current_user.username}, sort=[("_id", -1)])
+        user_score = latest_score["numClick"]
+        
+        # Get all user scores for distribution calculation
         docs = db.statistics.find({}, {"_id":0, "numClick": 1}).sort("numClick", 1)
         all_scores = [d["numClick"] for d in docs if "numClick" in d]
 
@@ -212,13 +216,30 @@ def create_app():
         num_less = sum(1 for s in all_scores if s < user_score)
         percentile = round(100 * num_less / len(all_scores), 1)
 
+        # Get user's previous top score to check if this is a new personal best
+        previous_scores = list(db.statistics.find(
+            {"user": current_user.username, "_id": {"$ne": latest_score["_id"]}},
+            sort=[("numClick", -1)]
+        ))
+        
+        # Check if this is a new personal best
+        is_personal_best = False
+        if not previous_scores:
+            # First game, automatically a personal best
+            is_personal_best = True
+        else:
+            previous_best = max(s["numClick"] for s in previous_scores) if previous_scores else 0
+            # Only set to true if the new score is HIGHER than previous best, not equal
+            is_personal_best = user_score > previous_best
+
         return render_template(
             "results.html", 
             bins=bin, 
             username=current_user.username, 
             bin_size=bin_size, 
             user_score=user_score, 
-            percentile=percentile
+            percentile=percentile,
+            is_personal_best=is_personal_best
         )
 
     @app.route("/create_account")
