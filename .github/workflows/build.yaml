@@ -12,7 +12,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: web-app
+        working-directory: web_app
 
     steps:
       - uses: actions/checkout@v4
