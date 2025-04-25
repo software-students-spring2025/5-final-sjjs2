@@ -17,7 +17,7 @@ services:
     build: ./web_app
     container_name: web-app
     ports:
-      - "5002:5002"
+      - "80:5002"
     depends_on:
       - mongodb
     env_file:
