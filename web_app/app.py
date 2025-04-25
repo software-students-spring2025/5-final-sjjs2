@@ -24,6 +24,8 @@ import requests
 from flask import current_app
 import math
 from datetime import datetime, timedelta
+from flask import flash, get_flashed_messages
+
 
 
 def connect_mongodb():
@@ -133,7 +135,9 @@ def create_app():
                     user = User(user_id=str(user_data["_id"]), username=user_data["username"])
                     login_user(user)
                     return redirect(url_for("home"))
-                return render_template("login.html", error="Invalid username or password. Please try again.")
+                flash("Invalid credentials", "error")
+                return redirect(url_for("login"))
+                #return render_template("login.html", error="Invalid username or password. Please try again.")
         return render_template("login.html")
 
     @app.route("/signup", methods=["GET", "POST"])
@@ -147,7 +151,7 @@ def create_app():
             if password != confirm_password:
                 # Redirect to login with a flash message instead of showing an error
                 flash("Passwords did not match. Please try again.")
-                return redirect(url_for("login"))
+                return redirect(url_for("signup"))
                 
             db = app.config["db"]
             if db is not None:
@@ -156,7 +160,7 @@ def create_app():
                 if existing_user:
                     # Redirect to login with a flash message instead of showing an error
                     flash("Username already exists. Please log in or choose a different username.")
-                    return redirect(url_for("login"))
+                    return redirect(url_for("signup"))
                     
                 hashed_password = generate_password_hash(password)
                 # Store the username as provided by the user (preserving case)

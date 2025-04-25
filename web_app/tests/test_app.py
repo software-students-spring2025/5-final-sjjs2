@@ -71,17 +71,25 @@ def test_signup_user_already_exists(client, mock_db):
     mock_db.users.find_one.return_value = {"username": "alice"}
     response = client.post("/signup", data={
         "username": "alice",
-        "password": "test"
-    }, follow_redirects=True)
-    assert b"User already exists" in response.data
+        "password": "test",
+        "confirm_password": "test"
+    }, follow_redirects=True)   # <-- FOLLOW redirects
+    
+    # Look for the flashed message now
+    assert b"Username already exists" in response.data
 
 def test_login_failure(client, mock_db):
     mock_db.users.find_one.return_value = None
+
     response = client.post("/login", data={
         "username": "invalid",
         "password": "invalid"
-    }, follow_redirects=True)
+    }, follow_redirects=True)  # <-- ADD THIS
+
+    assert response.status_code == 200
     assert b"Invalid credentials" in response.data
+
+
 
 # ----------------------------------------
 # Protected Routes
@@ -92,14 +100,12 @@ def test_login_failure(client, mock_db):
 #    assert response.status_code == 200
 #    assert "/login" in response.headers["Location"]
 
-@patch("web_app.app.current_user")
-def test_home_requires_login(mock_user, client):
-    mock_user.is_authenticated = False  # Important: simulate NOT logged in
-
-    response = client.get("/", follow_redirects=False)
-
+def test_home_requires_login(client):
+    response = client.get("/home", follow_redirects=False)
     assert response.status_code == 302
     assert "/login" in response.headers["Location"]
+
+
 
 
 #@patch.dict(os.environ, {}, clear=True)
@@ -148,9 +154,13 @@ def test_signup_user_exists(client, mock_db):
     mock_db.users.find_one.return_value = {"username": "testuser"}
     response = client.post("/signup", data={
         "username": "testuser",
-        "password": "secret"
+        "password": "secret",
+        "confirm_password": "secret"
     }, follow_redirects=True)
-    assert b"already exists" in response.data
+
+    assert response.status_code == 200
+    assert b"Username already exists" in response.data
+
 
 def test_logout_redirects(client, login_test_user):
     response = client.get("/logout", follow_redirects=False)
@@ -162,8 +172,11 @@ def test_results_page(mock_user, client, mock_db, login_test_user):
     mock_user.username = "charlie"
     mock_user.is_authenticated = True
 
-    # Mock find_one to return the latest user's score
-    mock_db.statistics.find_one.return_value = {"numClick": 120}
+    # Mock find_one to return the latest user's score (needs "_id" to avoid KeyError)
+    mock_db.statistics.find_one.return_value = {
+        "_id": ObjectId(), 
+        "numClick": 120
+    }
 
     # Mock find().sort() to return all scores
     mock_cursor = MagicMock()
@@ -178,7 +191,8 @@ def test_results_page(mock_user, client, mock_db, login_test_user):
     response = client.get("/results", follow_redirects=True)
 
     assert response.status_code == 200
-    assert b"View Profile" in response.data  # because you're passing username
+    assert b"View Profile" in response.data
+
 
 
 def test_create_account_page(client):
@@ -267,3 +281,43 @@ def test_view_results_inserts_score(mock_user, client, mock_db, login_test_user)
         "numClick": 123,
         "user": "charlie"   # login_test_user.username
     })
+
+def test_index_page(client):
+    response = client.get("/")
+    assert response.status_code == 200
+    assert b"JITTER" in response.data
+
+def test_check_username_available(client, mock_db):
+    mock_db.users.find_one.return_value = None
+    response = client.post("/check_username", json={"username": "newuser"})
+    assert response.status_code == 200
+    assert response.json["available"] is True
+
+def test_check_username_taken(client, mock_db):
+    mock_db.users.find_one.return_value = {"username": "existing"}
+    response = client.post("/check_username", json={"username": "existing"})
+    assert response.status_code == 200
+    assert response.json["available"] is False
+
+def test_signup_passwords_dont_match(client):
+    response = client.post("/signup", data={
+        "username": "user1",
+        "password": "pass1",
+        "confirm_password": "notmatching"
+    }, follow_redirects=True)
+    assert b"Passwords did not match" in response.data
+
+@patch("web_app.app.current_user")
+def test_leaderboard_page(mock_user, client, mock_db, login_test_user):
+    mock_user.is_authenticated = True
+    mock_user.username = "charlie"
+
+    mock_db.statistics.aggregate.side_effect = [
+        [{"user": "a", "numClick": 300}, {"user": "b", "numClick": 250}],  # all_time
+        [{"user": "a", "numClick": 150}, {"user": "c", "numClick": 140}],  # daily
+        [{"_id": "a", "averageScore": 200.0, "gamesPlayed": 5}]           # average
+    ]
+
+    response = client.get("/leaderboard", follow_redirects=True)
+    assert response.status_code == 200
+    assert b"leaderboard" in response.data.lower()
