@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leaderboard - JITTER</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+  <style>
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .btn-black {
+      background-color: black;
+      color: white;
+      padding: 0.5rem 1.25rem;
+      border-radius: 9999px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    .btn-black:hover {
+      background-color: #333;
+    }
+    
+    .leaderboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+    
+    .leaderboard-card {
+      background-color: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      box-shadow: var(--shadow);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .leaderboard-title {
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--primary-color);
+    }
+    
+    .leaderboard-subtitle {
+      text-align: center;
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+      color: var(--neutral-600);
+    }
+    
+    .leaderboard-table {
+      width: 100%;
+      border-collapse: collapse;
+      flex-grow: 1;
+    }
+    
+    .leaderboard-table th,
+    .leaderboard-table td {
+      padding: 0.75rem;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+    
+    .leaderboard-table th {
+      font-weight: 600;
+      color: var(--neutral-600);
+      border-bottom: 1px solid var(--neutral-200);
+    }
+    
+    .leaderboard-table tr:nth-child(even) {
+      background-color: var(--neutral-50);
+    }
+    
+    .rank {
+      text-align: center;
+      font-weight: 600;
+    }
+    
+    .score {
+      text-align: right;
+      font-weight: 600;
+      color: var(--accent-color);
+    }
+    
+    .user-highlight {
+      background-color: rgba(207, 128, 101, 0.1) !important;
+    }
+    
+    @media (max-width: 768px) {
+      .leaderboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <h1 class="app-title">JITTER</h1>
+        </div>
+        <div class="nav-actions">
+          <a href="{{ url_for('profile') }}" class="btn-black">Profile</a>
+          <a href="{{ url_for('leaderboard') }}" class="btn-black">Leaderboard</a>
+          <a href="{{ url_for('home') }}" class="btn-black">Home</a>
+          <a href="{{ url_for('logout') }}" class="btn-black">Logout</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="hero" style="text-align: center; margin-bottom: 2rem;">
+        <h2 class="hero-title" style="font-size: 2.5rem;">Leaderboard</h2>
+        <p class="hero-subtitle" style="font-size: 1.125rem;">See how you rank among the fastest clickers</p>
+      </div>
+      
+      <div class="leaderboard-grid">
+        <div class="leaderboard-card">
+          <h3 class="leaderboard-title">All-Time Top 10</h3>
+          <div class="leaderboard-subtitle">Highest scores ever recorded</div>
+          <table class="leaderboard-table">
+            <thead>
+              <tr>
+                <th width="15%">Rank</th>
+                <th>Player</th>
+                <th width="25%">Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for entry in all_time_leaderboard %}
+                <tr {% if entry.username == current_user.username %}class="user-highlight"{% endif %}>
+                  <td class="rank">{{ entry.rank }}</td>
+                  <td>{{ entry.username }}</td>
+                  <td class="score">{{ entry.score }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="leaderboard-card">
+          <h3 class="leaderboard-title">Daily Top 10</h3>
+          <div class="leaderboard-subtitle">Scores from {{ daily_date }}</div>
+          <table class="leaderboard-table">
+            <thead>
+              <tr>
+                <th width="15%">Rank</th>
+                <th>Player</th>
+                <th width="25%">Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for entry in daily_leaderboard %}
+                <tr {% if entry.username == current_user.username %}class="user-highlight"{% endif %}>
+                  <td class="rank">{{ entry.rank }}</td>
+                  <td>{{ entry.username }}</td>
+                  <td class="score">{{ entry.score }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <div class="game-controls" style="max-width: 300px; margin: 3rem auto 0;">
+        <a href="{{ url_for('play_game') }}" class="btn btn-primary btn-full">Play Game</a>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
