@@ -11,17 +11,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Copy project to Droplet
+      - name: Copy project (excluding .env) to Droplet
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.DO_HOST }}
           username: ${{ secrets.DO_USER }}
           key: ${{ secrets.DO_SSH_KEY }}
-          source: "./* .env"
+          source: "."
           target: "/opt/myapp"
           strip_components: 0
 
-      - name: Deploy via SSH
+      - name: Create .env file on Droplet
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USER }}
+          key: ${{ secrets.DO_SSH_KEY }}
+          script: |
+            echo "${{ secrets.DOTENV_CONTENT }}" > /opt/myapp/.env
+
+      - name: Deploy with Docker Compose
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.DO_HOST }}
