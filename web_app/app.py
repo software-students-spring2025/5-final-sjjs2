@@ -189,8 +189,9 @@ def create_app():
     def create_account():
         return render_template("signup.html")
     
-    @login_required
+    
     @app.route("/play_game")
+    @login_required
     def play_game():
         return render_template("game.html")
     
