@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1v1 Setup - JITTER</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+  <style>
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .btn-black {
+      background-color: black;
+      color: white;
+      padding: 0.5rem 1.25rem;
+      border-radius: 9999px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    .btn-black:hover {
+      background-color: #333;
+    }
+
+    .setup-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 2rem;
+      background-color: white;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+    }
+
+    .player-input {
+      margin-bottom: 1.5rem;
+    }
+
+    .player-input label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    .player-input input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--neutral-300);
+      border-radius: var(--radius);
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <h1 class="app-title">JITTER</h1>
+        </div>
+        <div class="nav-actions">
+          <a href="{{ url_for('home') }}" class="btn-black">Play</a>
+          <a href="{{ url_for('leaderboard') }}" class="btn-black">Leaderboard</a>
+          <a href="{{ url_for('profile') }}" class="btn-black">Profile</a>
+          <a href="{{ url_for('logout') }}" class="btn-black">Logout</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="setup-container">
+        <h2 class="hero-title" style="text-align: center; margin-bottom: 2rem;">1v1 Mode Setup</h2>
+        <form id="one-v-one-form">
+          <div class="player-input">
+            <label for="player1">Player 1 Name</label>
+            <input type="text" id="player1" name="player1" required>
+          </div>
+          <div class="player-input">
+            <label for="player2">Player 2 Name</label>
+            <input type="text" id="player2" name="player2" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">Start Game</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.getElementById('one-v-one-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const player1 = document.getElementById('player1').value;
+      const player2 = document.getElementById('player2').value;
+      
+      // Store player names in sessionStorage
+      sessionStorage.setItem('player1', player1);
+      sessionStorage.setItem('player2', player2);
+      
+      // Redirect to 1v1 game page
+      window.location.href = "{{ url_for('one_v_one_game') }}";
+    });
+  </script>
+</body>
+</html> 
