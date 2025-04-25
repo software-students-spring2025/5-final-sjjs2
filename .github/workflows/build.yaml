@@ -1,9 +1,38 @@
-name: Deploy to DigitalOcean
+name: CI/CD
 
 on:
   push:
+    branches: [main]
+  pull_request:
 
 jobs:
+  build:
+    name: Build Web App
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: web-app
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.13"
+
+      - run: pip install pipenv
+      - run: pipenv sync --dev
+      - run: pipenv run pytest --cov=. --cov-report=term-missing
+
+      - name: Enforce 80% test coverage
+        run: |
+          COVERAGE=$(pipenv run coverage report | grep TOTAL | awk '{print $4}' | sed 's/%//')
+          echo "Coverage: $COVERAGE%"
+          if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+            echo "Test coverage is below 80%" >&2
+            exit 1
+          fi
   deploy:
     runs-on: ubuntu-latest
 
