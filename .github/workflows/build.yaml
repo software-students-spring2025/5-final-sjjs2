@@ -1,17 +1,50 @@
-name: Deploy to DigitalOcean
+name: CI/CD
 
 on:
   push:
+  pull_request:
 
 jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: web_app
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - run: pip install pipenv
+      - run: pipenv install --dev
+
+      - name: Run Tests with Coverage
+        run: pipenv run pytest --cov=. --cov-report=term-missing
+
+      - name: Enforce 80% test coverage
+        run: |
+          COVERAGE=$(pipenv run coverage report | grep TOTAL | awk '{print $4}' | sed 's/%//')
+          echo "Coverage: $COVERAGE%"
+          if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+            echo "Test coverage is below 80%" >&2
+            exit 1
+          fi
+
   deploy:
+    name: Deploy to Droplet
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Copy project (excluding .env) to Droplet
+      - name: Copy project to Droplet
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.DO_HOST }}
