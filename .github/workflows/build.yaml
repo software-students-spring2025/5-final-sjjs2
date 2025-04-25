@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    name: Build Web App
+    name: Build and Test
     runs-on: ubuntu-latest
 
     defaults:
@@ -18,11 +18,13 @@ jobs:
 
       - uses: actions/setup-python@v4
         with:
-          python-version: "3.13"
+          python-version: "3.11"
 
       - run: pip install pipenv
-      - run: pipenv sync --dev
-      - run: pipenv run pytest --cov=. --cov-report=term-missing
+      - run: pipenv install --dev
+
+      - name: Run Tests with Coverage
+        run: pipenv run pytest --cov=. --cov-report=term-missing
 
       - name: Enforce 80% test coverage
         run: |
@@ -32,14 +34,17 @@ jobs:
             echo "Test coverage is below 80%" >&2
             exit 1
           fi
+
   deploy:
+    name: Deploy to Droplet
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Copy project (excluding .env) to Droplet
+      - name: Copy project to Droplet
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.DO_HOST }}
