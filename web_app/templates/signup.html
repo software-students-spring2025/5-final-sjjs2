@@ -32,6 +32,25 @@
     .btn-black:hover {
       background-color: #333;
     }
+    
+    .username-feedback {
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+      transition: all 0.2s ease;
+    }
+    
+    .username-available {
+      color: #22c55e;
+    }
+    
+    .username-taken {
+      color: #ef4444;
+    }
+    
+    .username-checking {
+      color: #f59e0b;
+      font-style: italic;
+    }
   </style>
 </head>
 <body>
@@ -39,14 +58,13 @@
     <div class="container">
       <div class="header-content">
         <div class="logo">
-            <h1 class="app-title">JITTER</h1>
-          </div>
-          <nav class="nav-links">
-            <!-- No nav links for signup page -->
-          </nav> 
-          <div>
-            <a href="{{ url_for('login') }}" class="btn-black">Log In</a>
-          </div>
+          <h1 class="app-title">JITTER</h1>
+        </div>
+        <div class="nav-actions">
+          <a href="{{ url_for('home') }}" class="btn-black">Home</a>
+          <a href="{{ url_for('login') }}" class="btn-black">Log In</a>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -58,14 +76,11 @@
           <p class="hero-subtitle" style="font-size: 1.125rem;">Join others testing their clicking speed</p>
         </div>
         
-        <form action="{{ url_for('signup') }}" method="POST">
-          {% if error %}
-            <p style="color: red; text-align: center; margin-top: 1rem;">{{ error }}</p>
-          {% endif %}
-
+        <form action="{{ url_for('signup') }}" method="POST" id="signup-form">
           <div class="form-group">
             <label for="username" class="form-label">Username</label>
             <input type="text" class="form-control" id="username" name="username" placeholder="Choose a username" required>
+            <div id="username-feedback" class="username-feedback"></div>
           </div>
           
           <div class="form-group">
@@ -76,9 +91,10 @@
           <div class="form-group">
             <label for="confirm_password" class="form-label">Confirm Password</label>
             <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm your password" required>
+            <div id="password-feedback" class="username-feedback"></div>
           </div>
           
-          <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+          <button type="submit" class="btn btn-primary btn-full" id="submit-btn">Create Account</button>
         </form>
         
         <p style="text-align: center; margin-top: 1.5rem; color: var(--neutral-600);">
@@ -87,5 +103,143 @@
       </div>
     </div>
   </main>
+
+  <script>
+    // Elements
+    const usernameInput = document.getElementById('username');
+    const usernameFeedback = document.getElementById('username-feedback');
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirm_password');
+    const passwordFeedback = document.getElementById('password-feedback');
+    const submitBtn = document.getElementById('submit-btn');
+    const signupForm = document.getElementById('signup-form');
+    
+    // Variables to track validation state
+    let usernameAvailable = false;
+    let passwordsMatch = false;
+    let checkingUsername = false;
+    let typingTimer;
+    
+    // Check username availability after typing stops (debounce)
+    usernameInput.addEventListener('input', function() {
+      clearTimeout(typingTimer);
+      
+      if (usernameInput.value.length > 0) {
+        usernameFeedback.textContent = 'Checking availability...';
+        usernameFeedback.className = 'username-feedback username-checking';
+        checkingUsername = true;
+        
+        typingTimer = setTimeout(checkUsernameAvailability, 500);
+      } else {
+        usernameFeedback.textContent = '';
+        usernameAvailable = false;
+      }
+      
+      updateSubmitButton();
+    });
+    
+    // Check if passwords match
+    confirmPasswordInput.addEventListener('input', function() {
+      if (confirmPasswordInput.value.length > 0) {
+        if (passwordInput.value === confirmPasswordInput.value) {
+          passwordFeedback.textContent = 'Passwords match';
+          passwordFeedback.className = 'username-feedback username-available';
+          passwordsMatch = true;
+        } else {
+          passwordFeedback.textContent = 'Passwords do not match';
+          passwordFeedback.className = 'username-feedback username-taken';
+          passwordsMatch = false;
+        }
+      } else {
+        passwordFeedback.textContent = '';
+        passwordsMatch = false;
+      }
+      
+      updateSubmitButton();
+    });
+    
+    passwordInput.addEventListener('input', function() {
+      if (confirmPasswordInput.value.length > 0) {
+        if (passwordInput.value === confirmPasswordInput.value) {
+          passwordFeedback.textContent = 'Passwords match';
+          passwordFeedback.className = 'username-feedback username-available';
+          passwordsMatch = true;
+        } else {
+          passwordFeedback.textContent = 'Passwords do not match';
+          passwordFeedback.className = 'username-feedback username-taken';
+          passwordsMatch = false;
+        }
+      }
+      
+      updateSubmitButton();
+    });
+    
+    // Check username availability via AJAX
+    function checkUsernameAvailability() {
+      const username = usernameInput.value;
+      
+      if (username.length === 0) {
+        usernameFeedback.textContent = '';
+        usernameAvailable = false;
+        checkingUsername = false;
+        updateSubmitButton();
+        return;
+      }
+      
+      fetch('/check_username', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({username: username})
+      })
+      .then(response => response.json())
+      .then(data => {
+        checkingUsername = false;
+        
+        if (data.available) {
+          usernameFeedback.textContent = 'Username available';
+          usernameFeedback.className = 'username-feedback username-available';
+          usernameAvailable = true;
+        } else {
+          usernameFeedback.textContent = 'Username already taken';
+          usernameFeedback.className = 'username-feedback username-taken';
+          usernameAvailable = false;
+        }
+        
+        updateSubmitButton();
+      })
+      .catch(error => {
+        console.error('Error checking username:', error);
+        checkingUsername = false;
+        usernameFeedback.textContent = '';
+        updateSubmitButton();
+      });
+    }
+    
+    // Update submit button state
+    function updateSubmitButton() {
+      // Disable if username is taken or we're still checking
+      submitBtn.disabled = checkingUsername || !usernameAvailable || !passwordsMatch;
+      
+      if (submitBtn.disabled) {
+        submitBtn.style.opacity = '0.7';
+        submitBtn.style.cursor = 'not-allowed';
+      } else {
+        submitBtn.style.opacity = '1';
+        submitBtn.style.cursor = 'pointer';
+      }
+    }
+    
+    // Form submission - prevent if validation fails
+    signupForm.addEventListener('submit', function(event) {
+      if (!usernameAvailable || checkingUsername || !passwordsMatch) {
+        event.preventDefault();
+      }
+    });
+    
+    // Initial button state
+    updateSubmitButton();
+  </script>
 </body>
 </html>

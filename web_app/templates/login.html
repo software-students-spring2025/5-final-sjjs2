@@ -32,6 +32,20 @@
     .btn-black:hover {
       background-color: #333;
     }
+    
+    .error-message {
+      background-color: rgba(239, 68, 68, 0.1);
+      border-left: 4px solid #ef4444;
+      color: #b91c1c;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.95rem;
+    }
+    
+    .error-message p {
+      margin: 0;
+    }
   </style>
 </head>
 <body>
@@ -43,7 +57,7 @@
         </div>
         <div class="nav-actions">
           <a href="{{ url_for('home') }}" class="btn-black">Home</a>
-          <a href="{{ url_for('create_account') }}" class="btn-black">Sign Up</a>
+          <a href="{{ url_for('signup') }}" class="btn-black">Sign Up</a>
         </div>
       </div>
     </div>
@@ -57,11 +71,13 @@
           <p class="hero-subtitle" style="font-size: 1.125rem;">Log in to continue tracking your clicking progress</p>
         </div>
         
+        {% if error %}
+        <div class="error-message">
+          <p>{{ error }}</p>
+        </div>
+        {% endif %}
+        
         <form action="{{ url_for('login') }}" method="POST">
-          {% if error %}
-            <p style="color: red; text-align: center; margin-top: 1rem;">{{ error }}</p>
-          {% endif %}
-
           <div class="form-group">
             <label for="username" class="form-label">Username</label>
             <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" required>
@@ -76,7 +92,7 @@
         </form>
         
         <p style="text-align: center; margin-top: 1.5rem; color: var(--neutral-600);">
-          Don't have an account? <a href="{{ url_for('create_account') }}" style="color: var(--accent-color); text-decoration: none; font-weight: 500;">Sign up</a>
+          Don't have an account? <a href="{{ url_for('signup') }}" style="color: var(--accent-color); text-decoration: none; font-weight: 500;">Sign up</a>
         </p>
       </div>
     </div>
