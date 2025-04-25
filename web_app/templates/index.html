@@ -18,8 +18,8 @@
           <nav class="nav-links">
             <!-- No nav links for landing page -->
           </nav>
-          <div>
-            <a href="{{ url_for('login') }}" class="nav-link" style="margin-right: 1rem;">Login</a>
+          <div class="nav-actions">
+            <a href="{{ url_for('login') }}" class="btn-black" style="margin-right: 1rem;">Login</a>
             <a href="{{ url_for('signup') }}" class="btn-black">Sign Up</a>
           </div>
     </div>
@@ -29,14 +29,14 @@
     <div class="container">
       <div class="hero">
         <h2 class="hero-title">How fast can you <span class="title-underline">click</span>?</h2>
-        <p class="hero-subtitle">Challenge yourself and compete with others in this addictive space bar clicking game. Create an account to track your progress and climb the global leaderboard.</p>
+        <p class="hero-subtitle">Challenge yourself and compete with others in this space bar clicking game. Create an account to track your progress and climb the global leaderboard.</p>
       </div>
       
       <div class="card-grid">
         <div class="card">
           <span class="card-label">PLAY</span>
           <h3 class="card-title">Test Your Speed</h3>
-          <p class="card-text">Press the space bar as many times as possible in 60 seconds. Simple, yet surprisingly addictive!</p>
+          <p class="card-text">Press the space bar as many times as possible in 10 seconds. Simple, yet surprisingly addictive!</p>
           <a href="{{ url_for('login') }}" class="btn-outline">Log In to Play</a>
         </div>
         
