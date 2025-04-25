@@ -84,14 +84,12 @@
         <div class="logo">
             <h1 class="app-title">JITTER</h1>
           </div>
-          <nav class="nav-links">
-            <a href="{{ url_for('home') }}" class="nav-link">Play</a>
-          </nav>
-          <div>
-            <a href="{{ url_for('leaderboard') }}" class="btn-black">Leaderboard</a>
-            <a href="{{ url_for('profile') }}" class="btn-black">Profile</a>
-            <a href="{{ url_for('logout') }}" class="btn-black">Logout</a>
-          </div>
+          <div class="nav-actions">
+            <a href="{{ url_for('home') }}" class="btn-black">Play</a>
+          <a href="{{ url_for('leaderboard') }}" class="btn-black">Leaderboard</a>
+          <a href="{{ url_for('profile') }}" class="btn-black">Profile</a>
+          <a href="{{ url_for('logout') }}" class="btn-black">Logout</a>
+        </div>
     </div>
   </header>
 
@@ -178,7 +176,6 @@
         
         <div class="game-controls" style="max-width: 300px;">
             <a href="{{ url_for('play_game') }}" class="btn btn-primary btn-full">Play Again</a>
-            <a href="{{ url_for('profile') }}" class="btn btn-outline btn-full" style="margin-top: 1rem;">View Profile</a>
           </div>
       </div>
     </div>
