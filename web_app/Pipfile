@@ -13,6 +13,7 @@ requests = "*"
 pymongo = "*"
 black = "*"
 pylint = "*"
+pytest-cov = "*"
 
 [dev-packages]
 
