@@ -96,6 +96,10 @@ def create_app():
     app.config["db"] = db
 
     @app.route("/")
+    def index(): 
+        return render_template("index.html")
+
+    @app.route("/home")
     @login_required
     def home():
         return render_home()
