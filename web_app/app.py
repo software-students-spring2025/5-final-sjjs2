@@ -23,6 +23,7 @@ from pymongo.errors import ConnectionFailure, ConfigurationError
 import requests
 from flask import current_app
 import math
+from datetime import datetime, timedelta
 
 
 def connect_mongodb():
@@ -222,6 +223,95 @@ def create_app():
             games_played=games_played
         )
 
+    @app.route("/leaderboard")
+    @login_required
+    def leaderboard():
+        db = current_app.config["db"]
+        
+        # Get all-time top scores, sorting by score (desc) and then by _id (desc) for most recent
+        all_time_pipeline = [
+            {"$sort": {"numClick": -1, "_id": -1}},  # Sort by score and then by _id (recent first)
+            {"$limit": 10}  # Get exactly top 10
+        ]
+        all_time_results = list(db.statistics.aggregate(all_time_pipeline))
+        
+        # Format all-time leaderboard with proper ranking (handling ties)
+        all_time_leaderboard = []
+        current_rank = 1
+        previous_score = None
+        
+        for result in all_time_results:
+            if previous_score is not None and result["numClick"] < previous_score:
+                current_rank += 1
+            
+            all_time_leaderboard.append({
+                "rank": current_rank,
+                "username": result.get("user", "Unknown"),
+                "score": result["numClick"]
+            })
+            
+            previous_score = result["numClick"]
+        
+        # Get daily top scores (from today)
+        today = datetime.now()
+        today_start = datetime(today.year, today.month, today.day)
+        tomorrow = today_start + timedelta(days=1)
+        
+        # Format date string for display
+        daily_date = today.strftime("%B %d, %Y")
+        
+        # MongoDB's ObjectId contains a timestamp, we can use this to filter by date
+        today_id = ObjectId.from_datetime(today_start)
+        tomorrow_id = ObjectId.from_datetime(tomorrow)
+        
+        daily_pipeline = [
+            {"$match": {"_id": {"$gte": today_id, "$lt": tomorrow_id}}},
+            {"$sort": {"numClick": -1, "_id": -1}},  # Sort by score and then by _id (recent first)
+            {"$limit": 10}  # Get exactly top 10
+        ]
+        
+        daily_results = list(db.statistics.aggregate(daily_pipeline))
+        
+        # Format daily leaderboard with proper ranking (handling ties)
+        daily_leaderboard = []
+        current_rank = 1
+        previous_score = None
+        
+        for result in daily_results:
+            if previous_score is not None and result["numClick"] < previous_score:
+                current_rank += 1
+            
+            daily_leaderboard.append({
+                "rank": current_rank,
+                "username": result.get("user", "Unknown"),
+                "score": result["numClick"]
+            })
+            
+            previous_score = result["numClick"]
+        
+        # Ensure both leaderboards have at least 10 entries for consistent height
+        # Fill with empty entries if needed
+        while len(all_time_leaderboard) < 10:
+            all_time_leaderboard.append({
+                "rank": "-",
+                "username": "-",
+                "score": "-"
+            })
+            
+        while len(daily_leaderboard) < 10:
+            daily_leaderboard.append({
+                "rank": "-",
+                "username": "-",
+                "score": "-"
+            })
+        
+        return render_template(
+            "leaderboard.html",
+            all_time_leaderboard=all_time_leaderboard,
+            daily_leaderboard=daily_leaderboard,
+            daily_date=daily_date
+        )
+    
     return app
 
 if __name__ == "__main__":
