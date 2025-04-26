@@ -128,8 +128,8 @@
         </div>
         
         <p class="instruction">
-          Player 1: Press <span class="accent-text">Left Shift</span> to click<br>
-          Player 2: Press <span class="accent-text">Right Shift</span> to click
+          Player 1: Press <span class="accent-text">"1"</span> to click<br>
+          Player 2: Press <span class="accent-text">"0"</span> to click
         </p>
         
         <div class="game-controls">
@@ -193,19 +193,33 @@
       }, 1000);
     }
 
+    let onePressed = false;
+    let zeroPressed = false;
     document.addEventListener("keydown", function(event) {
       if (!isGameActive) return;
-      
-      if (event.code === "ShiftLeft") {
+      if (event.repeat) return;
+
+      if (event.key === "1" && !onePressed) {
         event.preventDefault();
         player1Score++;
         player1ScoreDisplay.textContent = player1Score;
-      } else if (event.code === "ShiftRight") {
+      } 
+      if (event.key === "0" && !zeroPressed) {
         event.preventDefault();
         player2Score++;
         player2ScoreDisplay.textContent = player2Score;
       }
     });
+
+    document.addEventListener("keyup", function(event) {
+      if (event.key === "1"){
+        onePressed = false;
+      }
+      if (event.key === "0"){
+        zeroPressed = false;
+      }
+    })
+
   </script>
 </body>
 </html> 
