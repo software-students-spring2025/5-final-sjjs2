@@ -223,22 +223,6 @@ def test_profile_stats_no_data(mock_user, client, mock_db):
 # Game Results
 # ----------------------------------------
 
-#def test_view_results_inserts_score(client, mock_db, login_test_user): //see if fixable otherwise its fine to ignore
-#    # Simulate logged-in user
-#    with client.session_transaction() as sess:
-#        sess["_user_id"] = login_test_user.id  # real DummyUser ID injected
-#
-#    response = client.post("/view_results", json={"score": 123})
-#
-#    assert response.status_code == 200
-#    assert b"success" in response.data
-#
-#    mock_db.statistics.insert_one.assert_called_once_with({
-#        "numClick": 123,
-#        "user": "charlie"  # from login_test_user.username
-#    })
-
-
 def test_index_page(client):
     response = client.get("/")
     assert response.status_code == 200
