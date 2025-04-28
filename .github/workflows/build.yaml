@@ -23,6 +23,14 @@ jobs:
       - run: pip install pipenv
       - run: pipenv install --dev
 
+      - name: Create .env file for tests
+        run: |
+          echo "${{ secrets.DOTENV_CONTENT }}" > .env
+
+      - name: Show .env file
+        run: |
+          echo "---- PRINTING .env FILE ----"
+          cat .env
       - name: Run Tests with Coverage
         run: pipenv run pytest --cov=. --cov-report=term-missing
 
