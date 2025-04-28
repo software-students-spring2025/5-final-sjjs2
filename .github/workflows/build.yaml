@@ -2,6 +2,7 @@ name: CI/CD
 
 on:
   push:
+    branches: [main]
   pull_request:
 
 jobs:
@@ -23,6 +24,10 @@ jobs:
       - run: pip install pipenv
       - run: pipenv install --dev
 
+      - name: Create .env file for tests
+        run: |
+          echo "${{ secrets.DOTENV_CONTENT }}" > .env
+
       - name: Run Tests with Coverage
         run: pipenv run pytest --cov=. --cov-report=term-missing
 
@@ -39,6 +44,7 @@ jobs:
     name: Deploy to Droplet
     needs: build
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout code
@@ -71,5 +77,5 @@ jobs:
           key: ${{ secrets.DO_SSH_KEY }}
           script: |
             cd /opt/myapp
-            docker-compose down
+            docker-compose down -v
             docker-compose up -d --build

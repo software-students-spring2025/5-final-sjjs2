@@ -5,7 +5,6 @@ name = "pypi"
 
 [packages]
 flask = "*"
-python-dotenv = "*"
 flask-login = "*"
 pytest = "*"
 pytest-flask = "*"
@@ -14,6 +13,8 @@ pymongo = "*"
 black = "*"
 pylint = "*"
 pytest-cov = "*"
+pytz = "*"
+python-dotenv = "*"
 
 [dev-packages]
 

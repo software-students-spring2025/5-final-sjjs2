@@ -9,6 +9,9 @@ from flask_login import UserMixin
 import pytest
 from web_app.app import connect_mongodb
 from bson.objectid import ObjectId
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class DummyUser(UserMixin):
