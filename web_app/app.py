@@ -25,7 +25,7 @@ from flask import current_app
 import math
 from datetime import datetime, timedelta
 from flask import flash, get_flashed_messages
-
+import pytz  # Add pytz for timezone handling
 
 
 def connect_mongodb():
@@ -96,6 +96,25 @@ def create_app():
 
     # Store db connection in app config
     app.config["db"] = db
+
+    # Function to get current EST datetime
+    def get_est_datetime():
+        """Get the current datetime in Eastern Time"""
+        eastern = pytz.timezone('US/Eastern')
+        return datetime.now(eastern)
+
+    # Function to get EST day boundaries
+    def get_est_day_boundaries():
+        """Get the start and end of the current day in EST"""
+        eastern = pytz.timezone('US/Eastern')
+        est_now = datetime.now(eastern)
+        est_today_start = eastern.localize(datetime(est_now.year, est_now.month, est_now.day))
+        est_tomorrow_start = est_today_start + timedelta(days=1)
+        # Convert to UTC for MongoDB (ObjectId uses UTC)
+        utc_today_start = est_today_start.astimezone(pytz.UTC)
+        utc_tomorrow_start = est_tomorrow_start.astimezone(pytz.UTC)
+        
+        return est_now, utc_today_start, utc_tomorrow_start
 
     @app.route("/")
     def index(): 
@@ -191,9 +210,15 @@ def create_app():
         if db is not None:
             data = request.get_json()
             clicks = data.get("score")
+            
+            # Get current EST time for the record
+            est_now = get_est_datetime()
+            
             add = {
                 "numClick": clicks,
                 "user": current_user.username,
+                "timestamp": est_now.replace(tzinfo=None),  # Store as naive datetime for compatibility
+                "timezone": "EST"  # Mark the timezone for reference
             }
             db.statistics.insert_one(add)
             return jsonify({
@@ -294,6 +319,12 @@ def create_app():
     def leaderboard():
         db = current_app.config["db"]
         
+        # Get EST time boundaries for today
+        est_now, utc_today_start, utc_tomorrow_start = get_est_day_boundaries()
+        
+        # Format date string for display - use EST time for display
+        daily_date = est_now.strftime("%B %d, %Y") + " (EST)"
+        
         # Get all-time top scores, sorting by score (desc) and then by _id (desc) for most recent
         all_time_pipeline = [
             {"$sort": {"numClick": -1, "_id": -1}},  # Sort by score and then by _id (recent first)
@@ -318,23 +349,33 @@ def create_app():
             
             previous_score = result["numClick"]
         
-        # Get daily top scores (from today)
-        today = datetime.now()
-        today_start = datetime(today.year, today.month, today.day)
-        tomorrow = today_start + timedelta(days=1)
+        # Get daily top scores using the timestamp field for EST-based filtering
+        # For records with timestamp, use it directly
+        # For records without timestamp (older entries), fall back to ObjectId filtering
         
-        # Format date string for display
-        daily_date = today.strftime("%B %d, %Y")
+        # First, try to find any existing timestamp field to ensure backward compatibility
+        has_timestamp = db.statistics.find_one({"timestamp": {"$exists": True}})
         
-        # MongoDB's ObjectId contains a timestamp, we can use this to filter by date
-        today_id = ObjectId.from_datetime(today_start)
-        tomorrow_id = ObjectId.from_datetime(tomorrow)
-        
-        daily_pipeline = [
-            {"$match": {"_id": {"$gte": today_id, "$lt": tomorrow_id}}},
-            {"$sort": {"numClick": -1, "_id": -1}},  # Sort by score and then by _id (recent first)
-            {"$limit": 10}  # Get exactly top 10
-        ]
+        if has_timestamp:
+            # Use timestamp field for filtering
+            utc_today_naive = utc_today_start.replace(tzinfo=None)
+            utc_tomorrow_naive = utc_tomorrow_start.replace(tzinfo=None)
+            
+            daily_pipeline = [
+                {"$match": {"timestamp": {"$gte": utc_today_naive, "$lt": utc_tomorrow_naive}}},
+                {"$sort": {"numClick": -1, "_id": -1}},
+                {"$limit": 10}
+            ]
+        else:
+            # Fall back to ObjectId filtering
+            today_id = ObjectId.from_datetime(utc_today_start.replace(tzinfo=None))
+            tomorrow_id = ObjectId.from_datetime(utc_tomorrow_start.replace(tzinfo=None))
+            
+            daily_pipeline = [
+                {"$match": {"_id": {"$gte": today_id, "$lt": tomorrow_id}}},
+                {"$sort": {"numClick": -1, "_id": -1}},
+                {"$limit": 10}
+            ]
         
         daily_results = list(db.statistics.aggregate(daily_pipeline))
         
