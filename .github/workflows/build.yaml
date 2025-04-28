@@ -2,6 +2,7 @@ name: CI/CD
 
 on:
   push:
+    branches: [main]
   pull_request:
 
 jobs:
@@ -43,6 +44,7 @@ jobs:
     name: Deploy to Droplet
     needs: build
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout code
@@ -75,5 +77,5 @@ jobs:
           key: ${{ secrets.DO_SSH_KEY }}
           script: |
             cd /opt/myapp
-            docker-compose down
+            docker-compose down -v
             docker-compose up -d --build
