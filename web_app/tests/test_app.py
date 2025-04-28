@@ -10,7 +10,7 @@ import pytest
 from web_app.app import connect_mongodb
 from bson.objectid import ObjectId
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(dotenv_path="web_app/.env")
 
 
 class DummyUser(UserMixin):
