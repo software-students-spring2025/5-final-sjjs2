@@ -1,7 +1,7 @@
 # Final Project
 # Jitter - The Button-Mashing Game
 
-[![Web App CI]()]()
+[![Web App](https://github.com/software-students-spring2025/5-final-sjjs2/actions/workflows/build.yaml/badge.svg)](https://github.com/software-students-spring2025/5-final-sjjs2/actions/workflows/build.yaml)
 
 ## Project Description
 Jitter is an addictive button-mashing game that tests your fast-twitch muscles and reflexes. Press the space bar as many times as you can in 10 seconds and see how your quickness stacks up against all our other users. Keep playing to try to increase your average. Spam the space bar enough and it might land you on our leaderboard. Happy Clicking!
