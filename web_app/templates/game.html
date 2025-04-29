@@ -67,11 +67,11 @@
           <span class="counter-label">clicks</span>
         </div>
         
-        <p class="instruction">Press the <span class="accent-text">space bar</span> on your keyboard as many times as possible!</p>
+        <p class="instruction">Press the <span class="accent-text">space bar</span> on your keyboard as many times as possible! Timer will start with your first click.</p>
         
-        <!-- Game controls -->
+        <!-- Game controls - only show end controls -->
         <div class="game-controls">
-          <a href="#" class="btn btn-primary btn-full" id="start-btn">Start Game</a>
+          <!-- Start button removed -->
           
           <!-- These buttons are initially hidden via CSS and shown when game ends -->
           <div style="display: none; width: 100%;" id="end-controls">
@@ -84,31 +84,44 @@
   </main>
 
   <!--js script-->
-  <!--js script-->
   <script>
     let timeLeft = 10;
     let score = 0;
     let isGameActive = false;
+    let isGameStarted = false;
     let countdown;
 
     const timerDisplay = document.querySelector(".timer-value");
     const scoreDisplay = document.querySelector(".counter-value");
-    const startButton = document.getElementById("start-btn");
+    const endControls = document.getElementById("end-controls");
+    const restartButton = document.getElementById("restart-btn");
 
-    startButton.addEventListener("click", function(event){
-      event.preventDefault();
-      startGame();
-    });
+    // Event listener for restart button
+    if (restartButton) {
+      restartButton.addEventListener("click", function(event){
+        event.preventDefault();
+        resetGame();
+      });
+    }
 
-    function startGame(){
+    // Function to reset the game
+    function resetGame() {
       timeLeft = 10;
       score = 0;
-      isGameActive = true;
+      isGameActive = false;
+      isGameStarted = false;
+      
       scoreDisplay.textContent = score;
       timerDisplay.textContent = timeLeft;
+      
+      endControls.style.display = "none";
+    }
 
-      clearInterval(countdown);
-
+    // Function to start the game timer
+    function startGameTimer() {
+      isGameStarted = true;
+      isGameActive = true;
+      
       countdown = setInterval(() => {
         timeLeft--;
         timerDisplay.textContent = timeLeft;
@@ -116,6 +129,7 @@
         if (timeLeft <= 0){
           clearInterval(countdown);
           isGameActive = false;
+          endControls.style.display = "block";
 
           fetch("/view_results", {
             method: "POST",
@@ -142,11 +156,19 @@
     let spacePressed = false;
 
     document.addEventListener("keydown", function(event) {
-      if (isGameActive && event.code === "Space" && !spacePressed) {
+      if (event.code === "Space" && !spacePressed) {
         event.preventDefault();
         spacePressed = true;
-        score++;
-        scoreDisplay.textContent = score;
+        
+        // Start the game on first space press if not already started
+        if (!isGameStarted) {
+          startGameTimer();
+        }
+        
+        if (isGameActive) {
+          score++;
+          scoreDisplay.textContent = score;
+        }
       }
     });
 
@@ -155,6 +177,9 @@
         spacePressed = false;
       }
     });
+
+    // Initialize the page
+    resetGame();
   </script>
 </body>
 </html>
